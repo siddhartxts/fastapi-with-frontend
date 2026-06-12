@@ -39,8 +39,8 @@ The dashboard talks to the FastAPI backend using HTTP requests.
 For example:
 
 - The browser opens `/`
-- FastAPI returns `templates/home.html`
-- The browser loads `static/js/app.js`
+- FastAPI returns `src/finance_backend/templates/home.html`
+- The browser loads `src/finance_backend/static/js/app.js`
 - JavaScript calls API routes like `/watchlist/` and `/financenotes/`
 - FastAPI saves and reads data using SQLAlchemy
 - SQLAlchemy talks to PostgreSQL
@@ -76,10 +76,8 @@ Browser
 
 ```text
 fin_back/
-  main.py
-  database.py
-  models.py
   requirements.txt
+  pyproject.toml
   Dockerfile
   docker-compose.yml
   .env
@@ -87,18 +85,27 @@ fin_back/
   .gitignore
   .dockerignore
 
-  routers/
-    watchlist.py
-    financenotes.py
+  src/
+    finance_backend/
+      __init__.py
+      main.py
+      database.py
+      dependencies.py
+      models.py
+      schemas.py
 
-  templates/
-    home.html
+      routers/
+        watchlist.py
+        finance_notes.py
 
-  static/
-    css/
-      styles.css
-    js/
-      app.js
+      templates/
+        home.html
+
+      static/
+        css/
+          styles.css
+        js/
+          app.js
 
   alembic/
     env.py
@@ -109,21 +116,55 @@ Important files:
 
 | File | Purpose |
 | --- | --- |
-| `main.py` | Creates the FastAPI app, serves the homepage, loads routers, mounts static files |
-| `database.py` | Creates the database connection using SQLAlchemy |
-| `models.py` | Defines database tables using SQLAlchemy models |
-| `routers/watchlist.py` | API routes for watchlist items |
-| `routers/financenotes.py` | API routes for finance notes |
-| `templates/home.html` | The browser page |
-| `static/js/app.js` | Frontend JavaScript that calls the API |
-| `static/css/styles.css` | Frontend styling |
+| `src/finance_backend/main.py` | Creates the FastAPI app, serves the homepage, loads routers, mounts static files |
+| `src/finance_backend/database.py` | Creates the database connection using SQLAlchemy |
+| `src/finance_backend/dependencies.py` | Shared FastAPI dependencies, such as the database session |
+| `src/finance_backend/models.py` | Defines database tables using SQLAlchemy models |
+| `src/finance_backend/schemas.py` | Defines request body shapes using Pydantic models |
+| `src/finance_backend/routers/watchlist.py` | API routes for watchlist items |
+| `src/finance_backend/routers/finance_notes.py` | API routes for finance notes |
+| `src/finance_backend/templates/home.html` | The browser page |
+| `src/finance_backend/static/js/app.js` | Frontend JavaScript that calls the API |
+| `src/finance_backend/static/css/styles.css` | Frontend styling |
 | `requirements.txt` | Python packages needed by the app |
+| `pyproject.toml` | Project/package metadata for the `src` layout |
 | `Dockerfile` | Instructions for building the FastAPI app container |
 | `docker-compose.yml` | Runs the API, PostgreSQL, and Adminer together |
 | `.env` | Your real local environment values |
 | `.env.example` | Safe template for other people |
 | `.gitignore` | Tells git what not to commit |
 | `.dockerignore` | Tells Docker what not to copy into the image |
+
+### Why Use `src/finance_backend`?
+
+The project uses a `src` layout now.
+
+That means the app code lives inside:
+
+```text
+src/finance_backend/
+```
+
+instead of sitting loose in the root folder.
+
+This is cleaner because:
+
+- The repo root contains project setup files
+- The application package lives in one clear place
+- Imports are less confusing as the app grows
+- Docker and deployment commands can point at one real package path
+
+The Python import path for the app is now:
+
+```text
+finance_backend.main:app
+```
+
+So when Uvicorn starts, it means:
+
+```text
+Import the finance_backend.main module and run the app object inside it.
+```
 
 ---
 
@@ -182,7 +223,7 @@ watchlist
 finance_notes
 ```
 
-The table definitions live in `models.py`.
+The table definitions live in `src/finance_backend/models.py`.
 
 ### What Is SQLAlchemy?
 
@@ -381,7 +422,7 @@ Plain Python does not automatically read `.env` in this project.
 
 So when running with `.venv`, either:
 
-- Let `database.py` use its default local database URL
+- Let `src/finance_backend/database.py` use its default local database URL
 - Or manually export `SQLALCHEMY_DATABASE_URL` before starting Uvicorn
 
 ---
@@ -633,7 +674,8 @@ Current Dockerfile:
 FROM python:3.14-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/src
 
 WORKDIR /app
 
@@ -641,11 +683,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY alembic.ini .
+COPY alembic ./alembic
+COPY src ./src
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "finance_backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 Line by line:
@@ -653,10 +697,13 @@ Line by line:
 | Line | Meaning |
 | --- | --- |
 | `FROM python:3.14-slim` | Start from a small Python image |
+| `PYTHONPATH=/app/src` | Tell Python where the app package lives inside the container |
 | `WORKDIR /app` | Use `/app` as the folder inside the container |
 | `COPY requirements.txt .` | Copy only requirements first |
 | `RUN pip install ...` | Install Python packages |
-| `COPY . .` | Copy the rest of the project into the image |
+| `COPY alembic.ini .` | Copy Alembic config for migrations |
+| `COPY alembic ./alembic` | Copy migration files |
+| `COPY src ./src` | Copy the application package |
 | `EXPOSE 8000` | Document that the app uses port 8000 |
 | `CMD [...]` | Start Uvicorn when the container starts |
 
@@ -881,13 +928,20 @@ If your password contains special characters, keep the single quotes around the 
 Run:
 
 ```bash
-uvicorn main:app --reload
+PYTHONPATH=src uvicorn finance_backend.main:app --reload
 ```
 
 Or:
 
 ```bash
-python -m uvicorn main:app --reload
+PYTHONPATH=src python -m uvicorn finance_backend.main:app --reload
+```
+
+On Windows PowerShell, use:
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m uvicorn finance_backend.main:app --reload
 ```
 
 The `--reload` flag means:
@@ -1213,7 +1267,7 @@ DELETE /financenotes/1
 
 ## Database Tables
 
-The database models live in `models.py`.
+The database models live in `src/finance_backend/models.py`.
 
 ### `watchlist`
 
@@ -1503,7 +1557,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 docker compose up -d db adminer
 export SQLALCHEMY_DATABASE_URL='postgresql://postgres:your_password@localhost:5432/fastapi'
-python -m uvicorn main:app --reload
+PYTHONPATH=src python -m uvicorn finance_backend.main:app --reload
 ```
 
 ---

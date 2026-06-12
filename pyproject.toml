@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finance-backend"
+version = "0.1.0"
+description = "FastAPI finance backend for watchlist items and finance notes."
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+finance_backend = [
+    "templates/*.html",
+    "static/css/*.css",
+    "static/js/*.js",
+]

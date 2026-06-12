@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text
 from datetime import datetime, timezone
 
-from database import Base
+from sqlalchemy import Column, DateTime, Integer, String, Text
+
+from .database import Base
 
 
 class WatchlistItem(Base):
