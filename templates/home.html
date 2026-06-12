@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+<body>
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Finance Backend</p>
+            <h1>Dashboard</h1>
+        </div>
+        <button id="refresh-all" class="secondary-button" type="button">Refresh Data</button>
+    </header>
+
+    <main class="dashboard">
+        <section class="panel">
+            <div class="panel-heading">
+                <h2>Add Watchlist Item</h2>
+                <p>Track a ticker, optional company name, and notes.</p>
+            </div>
+
+            <form id="watchlist-form" class="form-grid">
+                <label>
+                    Ticker
+                    <input id="watchlist-ticker" name="ticker" type="text" placeholder="AAPL" required>
+                </label>
+
+                <label>
+                    Company Name
+                    <input id="watchlist-company" name="company_name" type="text" placeholder="Apple Inc.">
+                </label>
+
+                <label class="full-width">
+                    Notes
+                    <textarea id="watchlist-notes" name="notes" rows="3" placeholder="Why this ticker is interesting"></textarea>
+                </label>
+
+                <button type="submit">Create Watchlist Item</button>
+            </form>
+
+            <p id="watchlist-message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <h2>Watchlist Items</h2>
+                <p>Loaded from <code>GET /watchlist/</code>.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ticker</th>
+                            <th>Company</th>
+                            <th>Notes</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody id="watchlist-table-body">
+                        <tr>
+                            <td colspan="5">Loading watchlist items...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <h2>Add Finance Note</h2>
+                <p>Save a note with a ticker, title, and content.</p>
+            </div>
+
+            <form id="finance-note-form" class="form-grid">
+                <label>
+                    Ticker
+                    <input id="note-ticker" name="ticker" type="text" placeholder="MSFT" required>
+                </label>
+
+                <label>
+                    Title
+                    <input id="note-title" name="title" type="text" placeholder="Earnings idea" required>
+                </label>
+
+                <label class="full-width">
+                    Content
+                    <textarea id="note-content" name="content" rows="4" placeholder="Write your finance note here" required></textarea>
+                </label>
+
+                <button type="submit">Create Finance Note</button>
+            </form>
+
+            <p id="finance-note-message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <h2>Finance Notes</h2>
+                <p>Loaded from <code>GET /financenotes/</code>.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ticker</th>
+                            <th>Title</th>
+                            <th>Content</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody id="finance-notes-table-body">
+                        <tr>
+                            <td colspan="5">Loading finance notes...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', path='/js/app.js') }}"></script>
+</body>
+</html>
