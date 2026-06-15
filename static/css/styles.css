@@ -1,18 +1,21 @@
 :root {
-    --bg: #f6faf7;
+    --bg: #f3f8f5;
     --surface: #ffffff;
-    --surface-soft: #edf7f1;
+    --surface-soft: #f1f8f4;
     --ink: #10201d;
     --muted: #66736f;
-    --line: #d8e5de;
+    --line: #d5e2db;
     --accent: #0f7a5a;
     --accent-strong: #095f45;
     --accent-soft: #dff4eb;
     --danger: #b42318;
     --danger-soft: #fde8e5;
     --warning: #926200;
-    --shadow: 0 18px 48px rgba(16, 32, 29, 0.08);
+    --shadow: 0 14px 34px rgba(16, 32, 29, 0.07);
+    --shadow-soft: 0 8px 20px rgba(16, 32, 29, 0.05);
     --radius: 8px;
+    --page-max: 1120px;
+    --page-gutter: 24px;
 }
 
 * {
@@ -26,9 +29,7 @@ html {
 body {
     margin: 0;
     min-height: 100%;
-    background:
-        radial-gradient(circle at top left, rgba(15, 122, 90, 0.12), transparent 34rem),
-        linear-gradient(180deg, #ffffff 0%, var(--bg) 42%);
+    background: linear-gradient(180deg, #fbfefd 0%, var(--bg) 360px);
     color: var(--ink);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     line-height: 1.5;
@@ -58,9 +59,10 @@ p {
 }
 
 h1 {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    line-height: 1;
-    margin-bottom: 12px;
+    font-size: clamp(2.05rem, 4vw, 3.15rem);
+    letter-spacing: 0;
+    line-height: 0.98;
+    margin-bottom: 14px;
 }
 
 h2 {
@@ -83,20 +85,28 @@ code {
 
 .app-shell {
     margin: 0 auto;
-    max-width: 1440px;
-    padding: 28px;
+    max-width: var(--page-max);
+    padding: 32px 0 56px;
+    width: calc(100% - (var(--page-gutter) * 2));
 }
 
 .topbar {
     align-items: flex-end;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(245, 251, 248, 0.96)),
+        var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
     display: flex;
     gap: 24px;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
+    padding: 30px;
 }
 
 .topbar-copy {
-    max-width: 760px;
+    max-width: 680px;
 }
 
 .topbar-copy p:last-child {
@@ -139,6 +149,7 @@ code {
     border-radius: var(--radius);
     cursor: pointer;
     display: inline-flex;
+    font-size: 0.92rem;
     font-weight: 800;
     justify-content: center;
     min-height: 40px;
@@ -197,33 +208,33 @@ code {
 .entry-grid,
 .records-grid {
     display: grid;
-    gap: 16px;
+    gap: 14px;
 }
 
 .summary-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin-bottom: 18px;
+    margin-bottom: 14px;
 }
 
 .metric-card,
 .panel {
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.96);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-soft);
 }
 
 .metric-card {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    min-height: 124px;
-    padding: 18px;
+    min-height: 112px;
+    padding: 16px;
 }
 
 .metric-card strong {
     color: var(--ink);
-    font-size: 2rem;
+    font-size: 1.85rem;
     line-height: 1;
 }
 
@@ -255,13 +266,14 @@ label span {
 
 .control-bar {
     align-items: end;
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.96);
     border: 1px solid var(--line);
     border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
     display: grid;
     gap: 12px;
     grid-template-columns: minmax(220px, 1fr) minmax(150px, 200px) minmax(150px, 190px) auto;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     padding: 14px;
 }
 
@@ -284,7 +296,7 @@ textarea {
 }
 
 textarea {
-    min-height: 108px;
+    min-height: 104px;
     resize: vertical;
 }
 
@@ -298,7 +310,7 @@ textarea:focus {
 .entry-grid,
 .records-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .panel {
@@ -414,7 +426,9 @@ textarea:focus {
 }
 
 .api-panel {
-    margin-bottom: 12px;
+    box-shadow: none;
+    margin: 0 auto;
+    max-width: 920px;
 }
 
 .api-flow {
@@ -511,8 +525,12 @@ textarea:focus {
 }
 
 @media (max-width: 640px) {
+    :root {
+        --page-gutter: 14px;
+    }
+
     .app-shell {
-        padding: 18px;
+        padding: 16px 0 32px;
     }
 
     h1 {
