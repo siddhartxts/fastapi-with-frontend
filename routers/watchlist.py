@@ -39,6 +39,7 @@ def create_watchlist_item(db: db_dependency, watchlist_item_request: Watch):
     watchlist_item_model = WatchlistItem(**watchlist_item_request.model_dump())
     db.add(watchlist_item_model)
     db.commit()
+    db.refresh(watchlist_item_model)
     return watchlist_item_model
 
 
@@ -50,6 +51,7 @@ def update_watchlist_item(db: db_dependency, watchlist_item_id: int, watchlist_i
         watchlist_item.company_name = watchlist_item_request.company_name
         watchlist_item.notes = watchlist_item_request.notes
         db.commit()
+        db.refresh(watchlist_item)
         return watchlist_item
 
     else:
